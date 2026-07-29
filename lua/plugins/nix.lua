@@ -9,7 +9,7 @@ return {
           settings = {
             nixd = {
               nixpkgs = {
-                expr = "import <nixpkgs> { }",
+                expr = 'import (builtins.getFlake "/home/tls123/.nix-config").inputs.nixpkgs { }',
               },
               options = {
                 nixos = {
