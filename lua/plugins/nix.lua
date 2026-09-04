@@ -1,3 +1,13 @@
+local function get_hostname()
+  local handle = io.popen("hostname")
+  if not handle then
+    return "unknown"
+  end
+  local hostname = handle:read("*l")
+  handle:close()
+  return hostname or "unknown"
+end
+
 local function find_flake_root()
   local path = vim.fn.expand("%:p:h")
   local root = vim.fs.find("flake.nix", { path = path, upward = true })[1]
@@ -22,7 +32,11 @@ return {
                   expr = "{ }",
                 },
                 home_manager = {
-                  expr = '(builtins.getFlake "' .. find_flake_root() .. '").homeConfigurations.tls123.options',
+                  expr = '(builtins.getFlake "'
+                    .. find_flake_root()
+                    .. '").homeConfigurations."tls123@'
+                    .. get_hostname()
+                    .. '".options',
                 },
               },
               formatting = {
