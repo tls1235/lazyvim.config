@@ -8,6 +8,16 @@ local function get_hostname()
   return hostname or "unknown"
 end
 
+local function get_username()
+  local handle = io.popen("whoami")
+  if not handle then
+    return "unknown"
+  end
+  local username = handle:read("*l")
+  handle:close()
+  return username or "unknown"
+end
+
 local function find_flake_root()
   local path = vim.fn.expand("%:p:h")
   local root = vim.fs.find("flake.nix", { path = path, upward = true })[1]
@@ -34,7 +44,9 @@ return {
                 home_manager = {
                   expr = '(builtins.getFlake "'
                     .. find_flake_root()
-                    .. '").homeConfigurations."tls123@'
+                    .. '").homeConfigurations."'
+                    .. get_username()
+                    .. "@"
                     .. get_hostname()
                     .. '".options',
                 },
