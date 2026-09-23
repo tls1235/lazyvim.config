@@ -1,6 +1,6 @@
 return {
   {
     "theprimeagen/harpoon",
-    lazy = false,
+    lazy = true,
   },
 }

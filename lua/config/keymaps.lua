@@ -1,9 +1,7 @@
--- Keymaps are automatically loaded on the VeryLazy event
--- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
--- Add any additional keymaps here
 local builtin = require("telescope.builtin")
 local mark = require("harpoon.mark")
 local ui = require("harpoon.ui")
+
 vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Telescope find files" })
 vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Telescope buffers" })
 vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Telescope help tags" })
@@ -11,33 +9,22 @@ vim.keymap.set("n", "<leader>fs", function()
   builtin.grep_string({ search = vim.fn.input("grep > ") })
 end)
 vim.keymap.set("n", "<leader>fg", builtin.git_files, { desc = "Telescope .git" })
+
 -- this is for harpoon
 vim.keymap.set("n", "<leader>a", mark.add_file)
 vim.keymap.set("n", "<C-e>", ui.toggle_quick_menu)
-vim.keymap.set("n", "<A-1>", function()
-  ui.nav_file(1)
-end)
-vim.keymap.set("n", "<A-2>", function()
-  ui.nav_file(2)
-end)
-vim.keymap.set("n", "<A-3>", function()
-  ui.nav_file(3)
-end)
-vim.keymap.set("n", "<A-q>", function()
-  ui.nav_file(4)
-end)
-vim.keymap.set("n", "<A-w>", function()
-  ui.nav_file(5)
-end)
-vim.keymap.set("n", "<A-e>", function()
-  ui.nav_file(6)
-end)
-vim.keymap.set("n", "<A-a>", function()
-  ui.nav_file(7)
-end)
-vim.keymap.set("n", "<A-s>", function()
-  ui.nav_file(8)
-end)
-vim.keymap.set("n", "<A-d>", function()
-  ui.nav_file(9)
-end)
+
+-- bufferline: jump to buffer by position in the tabline (replaces harpoon nav_file binds)
+local buffer_keys = { "1", "2", "3", "q", "w", "e", "a", "s", "d" }
+for i, key in ipairs(buffer_keys) do
+  vim.keymap.set("n", "<A-" .. key .. ">", function()
+    require("bufferline").go_to(i, true)
+  end, { desc = "Go to buffer " .. i })
+end
+
+-- bufferline: move current buffer left/right in the tabline
+vim.keymap.set("n", "<A-z>", "<cmd>BufferLineMovePrev<cr>", { desc = "Move buffer left" })
+vim.keymap.set("n", "<A-c>", "<cmd>BufferLineMoveNext<cr>", { desc = "Move buffer right" })
+vim.keymap.set("n", "<A-x>", function()
+  Snacks.bufdelete()
+end, { desc = "Delete current buffer" })
