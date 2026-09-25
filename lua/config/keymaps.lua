@@ -1,6 +1,6 @@
 local builtin = require("telescope.builtin")
-local mark = require("harpoon.mark")
-local ui = require("harpoon.ui")
+-- local mark = require("harpoon.mark")
+-- local ui = require("harpoon.ui")
 
 vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Telescope find files" })
 vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Telescope buffers" })
@@ -11,8 +11,8 @@ end)
 vim.keymap.set("n", "<leader>fg", builtin.git_files, { desc = "Telescope .git" })
 
 -- this is for harpoon
-vim.keymap.set("n", "<leader>a", mark.add_file)
-vim.keymap.set("n", "<C-e>", ui.toggle_quick_menu)
+-- vim.keymap.set("n", "<leader>a", mark.add_file)
+-- vim.keymap.set("n", "<C-e>", ui.toggle_quick_menu)
 
 -- bufferline: jump to buffer by position in the tabline (replaces harpoon nav_file binds)
 local buffer_keys = { "1", "2", "3", "q", "w", "e", "a", "s", "d" }
