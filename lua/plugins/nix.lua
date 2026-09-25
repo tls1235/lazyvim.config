@@ -18,8 +18,7 @@ local function get_username()
   return username or "unknown"
 end
 
-local function find_flake_root()
-  local path = vim.fn.expand("%:p:h")
+local function find_flake_root(path)
   local root = vim.fs.find("flake.nix", { path = path, upward = true })[1]
   return root and vim.fn.fnamemodify(root, ":h") or vim.fn.getcwd()
 end
@@ -32,24 +31,27 @@ return {
       servers = {
         nixd = {
           mason = false,
+          on_new_config = function(new_config, root_dir)
+            local flake_root = find_flake_root(root_dir)
+            new_config.settings.nixd.nixpkgs.expr = 'import (builtins.getFlake "'
+              .. flake_root
+              .. '").inputs.nixpkgs { }'
+            new_config.settings.nixd.options.home_manager.expr = '(builtins.getFlake "'
+              .. flake_root
+              .. '").homeConfigurations."'
+              .. get_username()
+              .. "@"
+              .. get_hostname()
+              .. '".options'
+          end,
           settings = {
             nixd = {
-              nixpkgs = {
-                expr = 'import (builtins.getFlake "' .. find_flake_root() .. '").inputs.nixpkgs { }',
-              },
+              nixpkgs = {},
               options = {
                 nixos = {
                   expr = "{ }",
                 },
-                home_manager = {
-                  expr = '(builtins.getFlake "'
-                    .. find_flake_root()
-                    .. '").homeConfigurations."'
-                    .. get_username()
-                    .. "@"
-                    .. get_hostname()
-                    .. '".options',
-                },
+                home_manager = {},
               },
               formatting = {
                 command = { "nixfmt", "-" },
@@ -64,9 +66,14 @@ return {
   {
     "saghen/blink.cmp",
     opts = {
+      completion = {
+        ghost_text = {
+          enabled = function()
+            return not vim.g.copilot_enabled
+          end,
+        },
+      },
       keymap = {
-        -- Force-close and reopen the menu instead of the default show/doc-toggle chain.
-        -- Fixes stale suggestions after typing, deleting, and retyping.
         ["<C-space>"] = {
           function(cmp)
             cmp.hide()

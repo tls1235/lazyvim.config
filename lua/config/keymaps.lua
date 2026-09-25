@@ -23,8 +23,8 @@ for i, key in ipairs(buffer_keys) do
 end
 
 -- bufferline: move current buffer left/right in the tabline
-vim.keymap.set("n", "<A-z>", "<cmd>BufferLineMovePrev<cr>", { desc = "Move buffer left" })
+vim.keymap.set("n", "<A-x>", "<cmd>BufferLineMovePrev<cr>", { desc = "Move buffer left" })
 vim.keymap.set("n", "<A-c>", "<cmd>BufferLineMoveNext<cr>", { desc = "Move buffer right" })
-vim.keymap.set("n", "<A-x>", function()
+vim.keymap.set("n", "<A-z>", function()
   Snacks.bufdelete()
 end, { desc = "Delete current buffer" })
