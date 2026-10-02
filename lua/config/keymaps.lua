@@ -10,6 +10,7 @@ vim.keymap.set("n", "<leader>fs", function()
 end)
 vim.keymap.set("n", "<leader>fg", builtin.git_files, { desc = "Telescope .git" })
 vim.keymap.set("n", "<leader>au", "<cmd>bufdo e!<cr>", { desc = "Undo all buffer changes" })
+vim.keymap.set("n", "<leader>aa", "<cmd>e!<cr>", { desc = "Undo all current buffer changes" })
 
 -- this is for harpoon
 -- vim.keymap.set("n", "<leader>a", mark.add_file)
