@@ -18,9 +18,10 @@ local function get_username()
   return username or "unknown"
 end
 
+-- Returns the nearest flake root above `path`, or nil if there is none.
 local function find_flake_root(path)
   local root = vim.fs.find("flake.nix", { path = path, upward = true })[1]
-  return root and vim.fn.fnamemodify(root, ":h") or vim.fn.getcwd()
+  return root and vim.fn.fnamemodify(root, ":h") or nil
 end
 
 return {
@@ -31,14 +32,19 @@ return {
       servers = {
         nixd = {
           mason = false,
-          on_new_config = function(new_config, root_dir)
+          before_init = function(params, config)
+            local root_dir = config.root_dir or params.rootPath or vim.fn.getcwd()
+
+            -- nixpkgs: use the project's flake if it has one, else the registered config flake.
             local flake_root = find_flake_root(root_dir)
-            new_config.settings.nixd.nixpkgs.expr = 'import (builtins.getFlake "'
-              .. flake_root
-              .. '").inputs.nixpkgs { }'
-            new_config.settings.nixd.options.home_manager.expr = '(builtins.getFlake "'
-              .. flake_root
-              .. '").homeConfigurations."'
+            local nixpkgs_flake = flake_root and ('(builtins.getFlake "' .. flake_root .. '")')
+              or '(builtins.getFlake "nixconfig")'
+
+            -- Mutate in place: nixd reads these tables via workspace/configuration.
+            config.settings.nixd.nixpkgs.expr = "import " .. nixpkgs_flake .. ".inputs.nixpkgs { }"
+
+            -- home-manager options: always from the registered `nixconfig` flake.
+            config.settings.nixd.options.home_manager.expr = '(builtins.getFlake "nixconfig").homeConfigurations."'
               .. get_username()
               .. "@"
               .. get_hostname()
